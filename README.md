@@ -13,3 +13,14 @@ SentinelMail est une sentinelle de défense qui analyse chaque message entrant p
 
 ### 💻 Stack Technique :
 `Python` | `PySide6` | `Scikit-Learn` | `OpenCV` | `IMAP/SSL`
+
+### 📸 Aperçus de l'application
+
+#### 1. Interface de Connexion
+![Connexion](images/interface_connexion.png)
+
+#### 2. Dashboard de Sécurité
+![Affichage](images/interface_affichage.png)
+
+#### 3. Module d'Explicabilité (IA)
+![Explicabilité](images/interface_explicabilite.png)
