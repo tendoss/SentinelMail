@@ -24,3 +24,25 @@ SentinelMail est une sentinelle de défense qui analyse chaque message entrant p
 
 **3. Interface d'Explicabilité (IA)**
 ![Explicabilité](images/interface_explicabilite.png)
+
+## 🚀 Installation et Lancement
+
+Suivez ces étapes pour installer SentinelMail sur votre machine (Linux ou Windows).
+
+### 1. Prérequis
+- Python 3.10 ou plus récent
+- Un compte Gmail avec un [Mot de passe d'application](https://myaccount.google.com/apppasswords)
+
+### 2. Clonage du projet
+```bash
+git clone [https://github.com/tendoss/SentinelMail.git](https://github.com/tendoss/SentinelMail.git)
+cd SentinelMail
+
+## 🎮 Comment lancer SentinelMail ?
+
+Une fois que vous avez installé les dépendances, vous pouvez lancer l'application de deux manières :
+
+### Option 1 : La commande standard (Tous systèmes)
+Ouvrez votre terminal dans le dossier du projet et tapez :
+```bash
+python3 main.py
