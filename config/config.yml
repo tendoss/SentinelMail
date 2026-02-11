@@ -1,0 +1,11 @@
+# Configuration par défaut pour MailGuard.
+# Remplace les valeurs ou mets les clés API dans les variables d'environnement.
+imap:
+  host: "imap.gmail.com"
+  port: 993
+  mailbox: "INBOX"
+reputation:
+  enable_virustotal: false
+  enable_gsb: false
+# Si tu actives les APIs, stocke les clés en variable d'environnement :
+# VIRUSTOTAL_API_KEY, GSB_API_KEY

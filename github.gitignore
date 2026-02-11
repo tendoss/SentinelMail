@@ -1,0 +1,10 @@
+# Données sensibles
+accounts.json
+.pwds.json
+*.joblib
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.env

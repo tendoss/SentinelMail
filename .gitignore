@@ -1,0 +1,17 @@
+# Dossiers lourds
+venv/
+__pycache__/
+
+# Fichiers de données sensibles
+accounts.json
+.pwds.json
+secret.key
+users_db.json
+config/credentials.json
+
+# Modèles IA (optionnel car lourds)
+dev_tools/
+*.joblib
+
+*.csv
+
