@@ -11,6 +11,9 @@ import numpy as np # Pour transformer les bytes en image
 from dateutil import parser
 from urllib.parse import urlparse
 
+# --- Modules de securite avancee (Phase 1 & 2) ---
+from security_enhanced import EmailAuthChecker, AdvancedUrlChecker, AttachmentForensics
+
 class MailAnalyzer:
     def __init__(self):
         try:
@@ -18,6 +21,10 @@ class MailAnalyzer:
             self.vectorizer = joblib.load('vectorizer.joblib')
         except:
             self.model = None
+        # Analyseurs avances (sans dependance payante)
+        self.auth_checker = EmailAuthChecker()
+        self.url_advanced = AdvancedUrlChecker()
+        self.att_forensics = AttachmentForensics()
 
     def get_geolocation(self, domain):
         """Trouve le pays d'origine du serveur mail."""
@@ -111,10 +118,15 @@ class MailAnalyzer:
         except: pass
         return score, details
 
-    def get_score(self, text, subject, sender, attachments):
+    def get_score(self, text, subject, sender, attachments, auth_header=None):
         report = [] 
+        domain = sender.split('@')[-1] if '@' in sender else ''
         
-        # 1. IA (Sémantique)
+        # 1. Authentification (SPF/DKIM/DMARC) - NOUVEAU
+        auth_score, auth_reasons = self.auth_checker.analyze(auth_header, domain)
+        report.extend(auth_reasons)
+
+        # 2. IA (Sémantique)
         ml_score = 0
         if self.model and self.vectorizer:
             try:
@@ -124,15 +136,20 @@ class MailAnalyzer:
                     report.append(f"🤖 IA [+{(ml_score*0.4):.1f}]: Vocabulaire typique du phishing détecté")
             except: ml_score = 0
             
-        # 2. URLs (Corps du mail)
+        # 3. URLs (Corps du mail) - AMÉLIORÉ
         url_score, url_count, url_reasons = self.analyze_urls(text)
         report.extend(url_reasons)
         
-        # 3. DNS
+        # Analyse URL avancée (homoglyphes, etc.) - NOUVEAU
+        adv_url_score, _, adv_url_reasons = self.url_advanced.analyze(text)
+        url_score += adv_url_score
+        report.extend(adv_url_reasons)
+        
+        # 4. DNS
         dns_score, dns_reasons = self.check_domain_dns(sender)
         report.extend(dns_reasons)
         
-        # 4. Pression Psychologique
+        # 5. Pression Psychologique
         pression_score = 0
         mots_urgence = ['urgent', 'immédiatement', 'suspendu', '24h', 'bloqué', 'police', 'huissier']
         found_words = [w for w in mots_urgence if w in text.lower()]
@@ -140,31 +157,38 @@ class MailAnalyzer:
             pression_score = 2
             report.append(f"🧠 Pression [+2.0]: Mots coercitifs trouvés ({', '.join(found_words)})")
 
-        # 5. Analyse des Pièces Jointes (PDF & QR Codes)
+        # 6. Analyse des Pièces Jointes (PDF, QR & Forensics étendu)
         att_score = 0
         for filename, content_bytes in attachments:
             ext = filename.lower().split('.')[-1]
             
-            # Analyse PDF
+            # Forensics avancé (Office, HTML, exécutables) - NOUVEAU
+            adv_att_s, adv_att_d = self.att_forensics.analyze(filename, content_bytes)
+            att_score += adv_att_s
+            report.extend(adv_att_d)
+
+            # Analyse PDF (existant)
             if ext == 'pdf':
                 pdf_s, pdf_d = self.analyze_pdf_bytes(content_bytes)
                 att_score += pdf_s
                 report.extend(pdf_d)
             
-            # Analyse Image (QR Code)
+            # Analyse Image (QR Code) (existant)
             if ext in ['png', 'jpg', 'jpeg', 'bmp']:
                 qr_s, qr_d = self.analyze_qr_code(content_bytes)
                 att_score += qr_s
                 report.extend(qr_d)
 
         # --- CALCUL FINAL ---
-        final_score = (ml_score * 0.4) + (min(url_score, 10) * 0.3) + (pression_score * 0.1) + dns_score + att_score
+        # On inclut le auth_score dans le calcul final
+        final_score = (ml_score * 0.4) + (min(url_score, 10) * 0.3) + (pression_score * 0.1) + dns_score + att_score + auth_score
         
-        location = self.get_geolocation(sender.split('@')[-1] if '@' in sender else '')
+        location = self.get_geolocation(domain)
         
         return round(min(final_score, 10), 2), location, report
 
 class MailWorker:
+    """Ancien worker IMAP (Legacy). Garde pour compatibilite ou autres services (Outlook/Yahoo)."""
     def __init__(self, host, user, password):
         self.host, self.user, self.password = host, user, password
         self.analyzer = MailAnalyzer()
@@ -187,6 +211,9 @@ class MailWorker:
             sender = str(msg.get('From', ''))
             sender_clean = re.search(r'<(.+?)>', sender)
             sender_email = sender_clean.group(1) if sender_clean else sender
+            
+            # Extraction Authentification (Authentication-Results)
+            auth_header = msg.get('Authentication-Results', '')
             
             # Extraction Date
             raw_date = str(msg.get('Date', ''))
@@ -217,7 +244,7 @@ class MailWorker:
                 body = msg.get_payload(decode=True).decode(errors='ignore')
             
             # ANALYSE COMPLETE
-            score, loc, report = self.analyzer.get_score(body, sub, sender_email, attachments)
+            score, loc, report = self.analyzer.get_score(body, sub, sender_email, attachments, auth_header=auth_header)
             
             results.append({
                 "uid": uid, "sub": sub, "score": score, 

@@ -1,3 +1,14 @@
+
+# Dossiers générés
+build/
+dist/
+__pycache__/
+
+# Fichiers sensibles (Secrets)
+credentials.json
+token.json
+config_notify.json
+
 # Dossiers lourds
 venv/
 __pycache__/
