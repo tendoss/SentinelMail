@@ -1,48 +1,83 @@
-# 🛡️ SentinelMail ULTIMATE V4
-> **L'Intelligence Artificielle au service de votre sécurité mail.**
+🛡️ SentinelMail
 
-SentinelMail est une sentinelle de défense qui analyse chaque message entrant pour détecter les tentatives de phishing avant que vous ne cliquiez.
+SentinelMail est un système hybride de détection de phishing conçu pour sécuriser les flux de messagerie professionnelle. En combinant l'intelligence artificielle (Apprentissage Automatique) et l'analyse déterministe des métadonnées réseau, SentinelMail offre une protection proactive contre les menaces modernes (phishing, ransomware, usurpation d'identité) sans compromettre la confidentialité des échanges.
 
-### 🔍 Caractéristiques principales :
-* 🤖 **Analyse IA (Random Forest)** : Détecte le vocabulaire suspect.
-* 🌍 **Geo-Tracking** : Localise l'origine du serveur (DNS/MX).
-* 📱 **Détection QR Code** : Analyse les liens cachés dans les images via OpenCV.
-* 📄 **Analyse PDF Binaire** : Scanne les scripts malveillants (`/JavaScript`).
-* 🔗 **Inspection d'URL** : Repère les adresses IP directes et domaines risqués.
-* 🧠 **Score d'Explicabilité** : Comprenez pourquoi un mail est jugé dangereux.
+Ce projet a été développé dans le cadre d'un travail de fin d'études pour la protection des infrastructures critiques de la Régie des Voies Aériennes (RVA).
+🚀 Fonctionnalités Clés
 
-### 💻 Stack Technique :
-`Python` | `PySide6` | `Scikit-Learn` | `OpenCV` | `IMAP/SSL`
+    Approche Hybride de Sécurité :
 
-### 📸 Aperçus de l'application
+        Module IA (Probabiliste) : Classification des e-mails via un modèle de forêt aléatoire (Random Forest) pour identifier les patterns textuels suspects.
 
-**1. Interface de Connexion**
-![Connexion](images/interface_connexion.png)
+        Module Déterministe (Réseau) : Vérification rigoureuse des standards de sécurité DNS (SPF, DKIM, DMARC) et analyse de la réputation des domaines (WHOIS, âge du domaine).
 
-**2. Interface d'Affichage des Emails**
-![Affichage](images/interface_affichage.png)
+    Intégration Gmail API : Connexion sécurisée via OAuth 2.0. Fini les mots de passe d'application risqués.
 
-**3. Interface d'Explicabilité (IA)**
-![Explicabilité](images/interface_explicabilite.png)
+    Protection des Données (Vault) : Stockage sécurisé des secrets via le trousseau système (keyring) ou chiffrement AES (Fernet), assurant qu'aucun identifiant ne traîne en clair.
 
-## 🚀 Installation et Lancement
+    Forensics Avancé : Analyse binaire des pièces jointes pour détecter les macros malveillantes (Office), les scripts HTML dangereux ou les redirections suspectes.
 
-Suivez ces étapes pour installer SentinelMail sur votre machine (Linux ou Windows).
+    Alerte Temps Réel : Notification immédiate via WhatsApp en cas de menace critique détectée.
 
-### 1. Prérequis
-- Python 3.10 ou plus récent
-- Un compte Gmail avec un [Mot de passe d'application](https://myaccount.google.com/apppasswords)
+🛠️ Architecture Technique
 
-### 2. Clonage du projet
-```bash
-git clone [https://github.com/tendoss/SentinelMail.git](https://github.com/tendoss/SentinelMail.git)
+Le système est découpé en modules spécialisés pour garantir modularité et performance :
+
+    main.py : Point d'entrée et interface graphique (GUI) développée avec PySide6.
+
+    logic_api.py : Gestionnaire de l'API Gmail et du flux OAuth 2.0.
+
+    logic.py : Moteur central orchestrant l'analyse des emails.
+
+    security_enhanced.py : Le cœur de l'analyse réseau (DNS, Forensics pièces jointes, URL homoglyphes).
+
+    vault.py : Gestionnaire de coffre-fort pour les credentials.
+
+    logic_notify.py : Module d'alerte pour Twilio et WhatsApp.
+
+⚙️ Prérequis
+
+Pour exécuter le projet, assure-toi d'avoir Python 3.x installé, puis installe les dépendances nécessaires :
+Bash
+
+pip install -r requirements.txt
+
+Note : Assure-toi d'avoir dnspython, scikit-learn, pandas, cryptography et PySide6 dans ton environnement.
+🚀 Installation & Lancement
+
+    Cloner le dépôt :
+    Bash
+
+git clone https://github.com/ton-nom-utilisateur/SentinelMail.git
 cd SentinelMail
 
-## 🎮 Comment lancer SentinelMail ?
+Configuration des API :
 
-Une fois que vous avez installé les dépendances, vous pouvez lancer l'application de deux manières :
+    Place ton fichier credentials.json (obtenu depuis la Google Cloud Console) à la racine.
 
-### Option 1 : La commande standard (Tous systèmes)
-Ouvrez votre terminal dans le dossier du projet et tapez :
-```bash
-python3 main.py
+    Configure tes clés Twilio dans config_notify.json si tu souhaites activer les alertes automatiques.
+
+Lancer l'application :
+Bash
+
+    python main.py
+
+📊 Résultats & Performances
+
+Le modèle d'apprentissage automatique a été entraîné sur un dataset de 30 000 emails, atteignant des performances robustes :
+
+    Précision globale : ~98%
+
+    Recall (détection des menaces) : ~99%
+
+    F1-Score : 0.98
+
+🛡️ Sécurité & Disclaimer
+
+Ce projet est conçu à des fins académiques et professionnelles pour sécuriser des infrastructures sensibles. Attention : Ne jamais stocker de jetons d'accès ou de fichiers de configuration contenant des secrets dans un dépôt public. Veillez à inclure les fichiers de configuration sensibles dans votre .gitignore.
+📜 Licence
+
+Ce projet est sous licence MIT. Vous êtes libre d'utiliser, modifier et distribuer ce code pour vos propres besoins de cybersécurité.
+👨‍💻 Auteur
+
+Développé avec passion pour la sécurisation des infrastructures nationales.
